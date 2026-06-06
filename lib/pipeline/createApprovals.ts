@@ -12,6 +12,7 @@ import {
   type GmailReplyContext,
   replySubject,
 } from "@/lib/gmail/replyContext";
+import { ensureOptionalReplyDrafts } from "@/lib/pipeline/ensureOptionalReplyDraft";
 
 function attachGmailThreadPayload(
   payload: Record<string, unknown>,
@@ -50,7 +51,11 @@ export async function createApprovalsFromOutput(
   usedFallback: boolean,
   gmailReplyContext?: Map<string, GmailReplyContext>
 ): Promise<string[]> {
-  const { allowed, dropped } = filterAllowedCards(output.approval_cards);
+  const enriched =
+    agentType === "ops"
+      ? ensureOptionalReplyDrafts(output, processedItems)
+      : output;
+  const { allowed, dropped } = filterAllowedCards(enriched.approval_cards);
 
   for (const card of dropped) {
     await safeWriteAuditEntry({
@@ -106,14 +111,15 @@ export async function createApprovalsFromOutput(
     if (!error && data) approvalIds.push(data.id);
   }
 
-  output.stats.approvals_created = approvalIds.length;
-  output.stats.actions_executed = 0;
+  enriched.stats.approvals_created = approvalIds.length;
+  enriched.stats.actions_executed = 0;
+  Object.assign(output, enriched);
 
   await safeWriteAuditEntry({
     user_id: userId,
     agent_type: agentType,
     action: "run_completed",
-    reasoning: output.run_summary,
+    reasoning: enriched.run_summary,
     status: "success",
     tars_model: output.tars_model,
     details: {

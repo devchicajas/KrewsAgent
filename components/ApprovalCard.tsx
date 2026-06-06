@@ -117,7 +117,8 @@ export function ApprovalCard({
 
       {isAdvisory && (
         <p className="text-matcha-bright text-base mb-2">
-          [ ADVISORY ONLY — NO EMAIL WILL BE DRAFTED OR SENT ]
+          [ SECURITY HEADS-UP — ACKNOWLEDGE OR DISMISS. OPTIONAL REPLY DRAFT MAY
+          APPEAR AS A SEPARATE CARD BELOW ]
         </p>
       )}
 

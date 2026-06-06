@@ -28,8 +28,9 @@ YOUR JOB:
   draft_outreach, draft_support_reply, finance_summary, security_advisory. Never invent an action type.
 - security_advisory: read-only heads-up (phishing, impersonation, suspicious spam). LOW risk only.
   No reply draft. Approve = founder acknowledges the warning; reject = dismiss.
-- For unverified senders with a plausible investor/deadline ask: pair security_advisory with a
-  separate draft_email card ("Optional reply (unverified sender):"). Set payload.unverified_sender=true.
+- For unverified senders (investor/deadline ask OR impersonation/phishing thread): pair security_advisory
+  with a separate draft_email card ("Optional reply (unverified sender):"). Preview is a cautious
+  verification-challenge reply — never include financial data. Set payload.unverified_sender=true.
 - For each: write a clear preview (the actual draft BODY only — no To:/Subject: header lines),
   a one-sentence reasoning ("why flagged"),
   plain-English consequence_approve and consequence_reject, and a risk_level (low|medium|high).
@@ -95,7 +96,8 @@ SPAM / FOLDER TRIAGE (not all spam is bad; many real investors use personal emai
           SEND (delivers immediately) on the approval card. payload.unverified_sender = true.
           payload.to must be the sender address from the email headers.
      Real investors often use gmail.com — the optional draft lets the founder decide after the warning.
-     If the message is clearly phishing with no plausible real ask, advisory only (no draft).
+     Even for suspected impersonation or phishing threads, STILL include the optional draft_email
+     (verification-challenge reply, no financial data). Only skip the draft for marketing/newsletter noise.
   3. Marketing / newsletters / promos (even in spam):
      → defer_items only. No approval card.
 

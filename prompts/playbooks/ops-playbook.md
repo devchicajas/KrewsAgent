@@ -14,7 +14,8 @@ SPAM / FOLDER TRIAGE (not all spam is bad; many real investors use personal emai
           SEND (delivers immediately) on the approval card. payload.unverified_sender = true.
           payload.to must be the sender address from the email headers.
      Real investors often use gmail.com — the optional draft lets the founder decide after the warning.
-     If the message is clearly phishing with no plausible real ask, advisory only (no draft).
+     Even for suspected impersonation or phishing threads, STILL include the optional draft_email
+     (verification-challenge reply, no financial data). Only skip the draft for marketing/newsletter noise.
   3. Marketing / newsletters / promos (even in spam):
      → defer_items only. No approval card.
 
