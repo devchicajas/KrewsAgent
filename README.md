@@ -4,7 +4,7 @@
 
 Your AI ops crew — for founders who can't hire help yet, but still can't afford to drop the ball.
 
-> Built for the [Tetrate AI Buildathon v2.0](https://tetrate.io) · [Repo](https://github.com/devchicajas/KrewsAgent) · [Buildathon submission](docs/BUILDATHON_SUBMISSION.md)
+> [Live app](https://krews-agent.vercel.app) · [Repo](https://github.com/devchicajas/KrewsAgent) · Built for the [Tetrate AI Buildathon v2.0](https://tetrate.io)
 
 ---
 
@@ -75,8 +75,8 @@ Every run and every decision goes to an **audit log** you can check on the Activ
 
 | Crew | Plain English | Connect |
 |------|---------------|---------|
-| **Ops** | Triage email (including spam), warn on phishing, draft investor replies | Gmail |
-| **Support** | Read GitHub issues, draft customer replies | GitHub |
+| **Ops** | Triage email (inbox + spam + threads), warn on phishing, draft investor replies | Gmail |
+| **Support** | Read GitHub issues + comment history, draft customer replies | GitHub |
 | **Growth** | Turn "what I shipped" into LinkedIn + outreach drafts | Just type your update |
 | **Finance** | Read-only runway / MRR summary | Nothing |
 
@@ -87,9 +87,38 @@ Every run and every decision goes to an **audit log** you can check on the Activ
 
 ---
 
-## How it works (technical)
+## Architecture
 
-KrewsAgent is a **multi-crew agent** — not one prompt, one pipeline shared by four specialist playbooks.
+KrewsAgent is **one agent runtime** with **four specialist crews**. Same pipeline every time — different data source and playbook per crew.
+
+### Agent vs crew
+
+| Term | Meaning |
+|------|---------|
+| **Agent** | The shared system: read your workspace → reason with AI → propose actions → wait for you |
+| **Crew** | A role the agent plays: Ops, Growth, Support, or Finance (`agent_type` in code) |
+| **Run** | One pipeline execution for a chosen crew — creates **pending** approval cards only |
+| **Approve** | A separate step that may call Gmail, GitHub, etc. — nothing executes without this |
+
+Ops is an **agent crew**, not a separate app. Picking OPS on the dashboard runs `agent_type: "ops"` through the same engine as Support or Growth.
+
+### System overview
+
+```
+Browser (Next.js UI)
+    │
+    ▼
+API routes  ──►  middleware (session or demo cookie)
+    │
+    ├── POST /api/agent/run         →  pipeline  →  pending approvals  (no side effects)
+    └── POST /api/approvals/approve  →  approval guard  →  Gmail / GitHub / audit
+    │
+    ▼
+Supabase (users, approvals, integrations, hash-chained action_log)
+    │
+    ▼
+External: TARS · Gmail API · GitHub API
+```
 
 ### The agent loop
 
@@ -105,18 +134,58 @@ KrewsAgent is a **multi-crew agent** — not one prompt, one pipeline shared by 
                                         Audit log (hash-chained)
 ```
 
-1. **Context** — Pull live Gmail (inbox + spam + tabs), GitHub issues, or your growth input. External content is fenced as untrusted.
-2. **Reason** — [Tetrate TARS](https://router.tetrate.ai) routes to Claude (Sonnet for drafts, Haiku for classify) with playbook rules per crew.
-3. **Propose** — Up to 3 approval cards. Run API creates `pending` only — zero side effects.
-4. **Execute** — Separate approve API calls Gmail (draft/send), GitHub (comment), or logs Growth drafts. Allowlist + risk floors enforced server-side.
+### The 7-stage pipeline
+
+Every crew run goes through `lib/pipeline/runPipeline.ts`:
+
+1. **Context** — Pull data for the active crew (see table below)
+2. **Fence** — Wrap Gmail/GitHub text as untrusted input; flag injection patterns
+3. **Classify** — TARS triage (skipped in demo mode for speed)
+4. **Plan + draft** — TARS drafts up to 3 actions using the crew playbook
+5. **Validate** — Allowlist action types; apply server-side risk floors
+6. **Approval queue** — Insert `pending` rows in `approvals` — no sends, no posts
+7. **Audit** — Hash-chained log entry for the run
+
+Execution is **not** part of this pipeline. Approving a card calls `lib/security/approvalGuard.ts` — the only path that creates Gmail drafts/sends or GitHub comments.
+
+### Two-phase design
+
+```
+Phase 1 — RUN                     Phase 2 — APPROVE (you)
+─────────────────                 ─────────────────────────
+Read inbox / issues               You click Draft / Send / Approve
+TARS drafts actions      →        approvalGuard runs
+Save pending cards                Side effects happen here (if you said yes)
+Zero side effects
+```
+
+The run endpoint cannot send email or post to GitHub. Only the approve endpoint can — and send requires a second confirm.
+
+### What each crew reads
+
+| Crew | Context source | On approve |
+|------|----------------|------------|
+| **Ops** | Gmail threads (inbox + spam + promotions/updates, last 14d) | Gmail draft or send (same thread) |
+| **Support** | Open GitHub issues + comment history | Post issue comment |
+| **Growth** | Your “what I shipped” textarea | Save draft / copy (no auto-post) |
+| **Finance** | Founder context from DB (MRR, runway) | Read-only — no execution |
+
+### Stack
+
+- **Frontend:** Next.js 14 (App Router), React
+- **API:** Next.js route handlers + `withSecurity` (auth, rate limits, validation)
+- **AI:** [Tetrate TARS](https://router.tetrate.ai) — OpenAI-compatible client, Claude via router
+- **Data:** Supabase Postgres
+- **Integrations:** Gmail OAuth, GitHub OAuth
+- **Deploy:** Vercel
 
 ### AI (TARS)
 
 - OpenAI-compatible client → `https://api.router.tetrate.ai/v1`
 - Primary: `claude-sonnet-4-6` · classify: `claude-haiku-4-5` · fallbacks: `gpt-4o`, `gemini-2.5-flash`
-- `DEMO_MODE` keeps judges unblocked if TARS is slow — fallback runs use the same gate
+- `DEMO_MODE` tries live TARS first; cached fallback uses the same approval gate if the router is slow
 
-### Security (why judges should trust it)
+### Security
 
 | Layer | What it means |
 |-------|----------------|
@@ -130,7 +199,7 @@ KrewsAgent is a **multi-crew agent** — not one prompt, one pipeline shared by 
 ### Privacy
 
 - Gmail/GitHub read **per run**, not bulk-archived in our DB
-- Approval previews + audit persist until you Clear Data
+- Approval previews + audit persist until you clear data
 - Demo mode uses fictional data — real OAuth blocked in placeholder mode
 
 ---
@@ -139,7 +208,7 @@ KrewsAgent is a **multi-crew agent** — not one prompt, one pipeline shared by 
 
 | Path | Who |
 |------|-----|
-| **Try the demo** | Judges, quick look — no account, simulated inbox |
+| **Try the demo** | Quick look — no account, simulated inbox |
 | **Sign up + connect** | Your real Gmail, GitHub, drafts, and sends |
 
 ---
@@ -161,7 +230,7 @@ npm run seed && npm run dev
 | `npm run account:reset -- email` | Fresh start for a user |
 | `npm test` | Security + helper tests |
 
-**Docs:** [Auth](docs/AUTH_SETUP.md) · [Gmail + GitHub](docs/INTEGRATIONS_SETUP.md) · [Buildathon copy](docs/BUILDATHON_SUBMISSION.md)
+**Docs:** [Auth](docs/AUTH_SETUP.md) · [Gmail + GitHub](docs/INTEGRATIONS_SETUP.md) · [Buildathon submission](docs/BUILDATHON_SUBMISSION.md)
 
 **Env:** Supabase + `AUTH_SECRET` required. `TARS_API_KEY` + OAuth secrets for full experience. See `.env.example`.
 
