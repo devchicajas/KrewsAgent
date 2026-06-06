@@ -11,6 +11,8 @@ export type InboxLocation = "inbox" | "spam" | "promotions" | "updates";
 export interface InboxMessage {
   id: string;
   threadId: string;
+  /** RFC Message-ID header from the latest message in the thread */
+  rfcMessageId: string;
   from: string;
   subject: string;
   body: string;
@@ -41,6 +43,7 @@ function locationLabel(location: InboxLocation): string {
 export function formatInboxMessageContent(msg: InboxMessage): string {
   const hint = senderTrustHint(msg.from, msg.subject, msg.location);
   const header = [
+    `Item-ID: ${msg.id}`,
     `Location: ${locationLabel(msg.location)}`,
     msg.messageCount > 1 ? `Thread: ${msg.messageCount} messages (full history below)` : null,
     `From: ${msg.from}`,
@@ -105,11 +108,13 @@ async function fetchThreadMessage(
   const headers = latest.payload?.headers;
   const from = headerValue(headers, "From");
   const subject = headerValue(headers, "Subject") || "(no subject)";
+  const rfcMessageId = headerValue(headers, "Message-ID");
   const body = formatThreadBody(messages);
 
   return {
     id: latest.id,
     threadId: ref.threadId,
+    rfcMessageId,
     from,
     subject,
     body,

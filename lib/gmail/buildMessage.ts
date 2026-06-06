@@ -1,6 +1,10 @@
 export interface EmailPayload {
   to?: string;
   subject?: string;
+  /** Gmail thread id — keeps draft/send in the same conversation */
+  threadId?: string;
+  /** RFC Message-ID of the message being replied to */
+  inReplyTo?: string;
 }
 
 export function extractEmailAddress(value: string): string {
@@ -64,12 +68,20 @@ export function prepareOutboundEmail(
   const to = payload.to?.trim()
     ? extractEmailAddress(payload.to)
     : parsed.to;
-  const subject = payload.subject?.trim() || parsed.subject || "Re: your message";
+  let subject = payload.subject?.trim() || parsed.subject || "Re: your message";
+  if (payload.inReplyTo && payload.subject?.trim()) {
+    subject = /^re:/i.test(subject) ? subject : `Re: ${subject}`;
+  }
 
   if (!to) return null;
 
   return {
-    payload: { to, subject },
+    payload: {
+      to,
+      subject,
+      threadId: payload.threadId,
+      inReplyTo: payload.inReplyTo,
+    },
     body: parsed.body,
   };
 }
@@ -82,14 +94,23 @@ export function buildGmailRawMessage(payload: EmailPayload, body: string): strin
   const to = resolved.to!.trim();
   const subject = resolved.subject?.trim() ?? "KrewsAgent draft";
 
-  const message = [
-    `To: ${to}`,
-    `Subject: ${subject}`,
+  const headerLines = [`To: ${to}`, `Subject: ${subject}`];
+
+  if (resolved.inReplyTo) {
+    const mid = resolved.inReplyTo.trim().startsWith("<")
+      ? resolved.inReplyTo.trim()
+      : `<${resolved.inReplyTo.trim()}>`;
+    headerLines.push(`In-Reply-To: ${mid}`, `References: ${mid}`);
+  }
+
+  headerLines.push(
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=utf-8",
     "",
-    cleanBody,
-  ].join("\r\n");
+    cleanBody
+  );
+
+  const message = headerLines.join("\r\n");
 
   return Buffer.from(message)
     .toString("base64")

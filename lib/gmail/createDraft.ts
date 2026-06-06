@@ -21,7 +21,12 @@ export async function tryCreateGmailDraft(
   try {
     const res = await gmail.users.drafts.create({
       userId: "me",
-      requestBody: { message: { raw } },
+      requestBody: {
+        message: {
+          raw,
+          ...(payload.threadId ? { threadId: payload.threadId } : {}),
+        },
+      },
     });
     return { created: true, draftId: res.data.id ?? undefined };
   } catch (err) {

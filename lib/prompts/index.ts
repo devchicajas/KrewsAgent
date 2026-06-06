@@ -107,7 +107,9 @@ IGNORE (defer/noise): newsletters, automated receipts, marketing, cold sales, no
 DRAFTING VOICE: warm, concise, founder-to-investor candor. Lead with the ask or the update.
   Real numbers when available (MRR, runway, shipped features). No corporate filler. No em dashes.
 HARD RULES: never invent metrics — only use numbers from founder_context. Max 3 proposals.
-  Investor updates are MEDIUM risk minimum. security_advisory is always LOW (audit log only).`,
+  Investor updates are MEDIUM risk minimum. security_advisory is always LOW (audit log only).
+  For draft_email replies: set payload.to to the sender address, payload.subject to "Re: …",
+  and payload.item_id to the Item-ID from the workspace item you are replying to.`,
 
     growth: `ROLE: Growth crew. Input = the founder's own sentence about what shipped this week.
 FLAG: turn shipped work into (a) one LinkedIn post draft, (b) one short cold outreach sequence.

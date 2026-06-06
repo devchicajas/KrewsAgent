@@ -19,7 +19,10 @@ export async function trySendGmailMessage(
   try {
     const res = await gmail.users.messages.send({
       userId: "me",
-      requestBody: { raw },
+      requestBody: {
+        raw,
+        ...(payload.threadId ? { threadId: payload.threadId } : {}),
+      },
     });
     return { sent: true, messageId: res.data.id ?? undefined };
   } catch (err) {

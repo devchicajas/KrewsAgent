@@ -128,6 +128,8 @@ export async function executeApproval(
     const emailPayload = {
       to: typeof payload.to === "string" ? payload.to : undefined,
       subject: typeof payload.subject === "string" ? payload.subject : undefined,
+      threadId: typeof payload.thread_id === "string" ? payload.thread_id : undefined,
+      inReplyTo: typeof payload.in_reply_to === "string" ? payload.in_reply_to : undefined,
     };
 
     if (deliveryMode === "send") {

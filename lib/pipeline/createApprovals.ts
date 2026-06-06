@@ -8,13 +8,47 @@ import {
   extractEmailAddress,
   parseLeadingEmailHeaders,
 } from "@/lib/gmail/buildMessage";
+import {
+  type GmailReplyContext,
+  replySubject,
+} from "@/lib/gmail/replyContext";
+
+function attachGmailThreadPayload(
+  payload: Record<string, unknown>,
+  gmailReplyContext?: Map<string, GmailReplyContext>
+): Record<string, unknown> {
+  if (!gmailReplyContext?.size) return payload;
+
+  let ctx: GmailReplyContext | undefined;
+  const itemId = typeof payload.item_id === "string" ? payload.item_id : undefined;
+  if (itemId) {
+    ctx = Array.from(gmailReplyContext.values()).find((c) => c.itemId === itemId);
+  }
+  if (!ctx && typeof payload.to === "string") {
+    ctx = gmailReplyContext.get(extractEmailAddress(payload.to));
+  }
+  if (!ctx) return payload;
+
+  const subject =
+    typeof payload.subject === "string" && payload.subject.trim()
+      ? payload.subject
+      : replySubject(ctx.subject);
+
+  return {
+    ...payload,
+    thread_id: ctx.threadId,
+    in_reply_to: ctx.rfcMessageId,
+    subject,
+  };
+}
 
 export async function createApprovalsFromOutput(
   userId: string,
   agentType: string,
   output: AgentRunOutput,
   processedItems: UntrustedItem[],
-  usedFallback: boolean
+  usedFallback: boolean,
+  gmailReplyContext?: Map<string, GmailReplyContext>
 ): Promise<string[]> {
   const { allowed, dropped } = filterAllowedCards(output.approval_cards);
 
@@ -47,6 +81,7 @@ export async function createApprovalsFromOutput(
       if (typeof payload.to === "string") {
         payload.to = extractEmailAddress(payload.to);
       }
+      payload = attachGmailThreadPayload(payload, gmailReplyContext);
     }
 
     const { data, error } = await supabase

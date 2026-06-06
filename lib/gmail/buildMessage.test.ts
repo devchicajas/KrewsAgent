@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseLeadingEmailHeaders, prepareOutboundEmail } from "./buildMessage";
+import {
+  buildGmailRawMessage,
+  parseLeadingEmailHeaders,
+  prepareOutboundEmail,
+} from "./buildMessage";
 
 describe("parseLeadingEmailHeaders", () => {
   it("strips To and Subject from preview body", () => {
@@ -36,5 +40,27 @@ Hello there.`
     expect(result?.payload.to).toBe("demo.projectz56t@gmail.com");
     expect(result?.payload.subject).toBe("Re: Q3 numbers");
     expect(result?.body).toBe("Hello there.");
+  });
+});
+
+describe("buildGmailRawMessage threading", () => {
+  it("includes In-Reply-To and References for thread replies", () => {
+    const raw = buildGmailRawMessage(
+      {
+        to: "sarah@sequoia.com",
+        subject: "Re: Q3 update",
+        threadId: "thread-abc",
+        inReplyTo: "<caf9@sarah.com>",
+      },
+      "Hi Sarah,\n\nHere are the numbers."
+    );
+    expect(raw).toBeTruthy();
+    const decoded = Buffer.from(
+      raw!.replace(/-/g, "+").replace(/_/g, "/"),
+      "base64"
+    ).toString("utf-8");
+    expect(decoded).toContain("In-Reply-To: <caf9@sarah.com>");
+    expect(decoded).toContain("References: <caf9@sarah.com>");
+    expect(decoded).toContain("Subject: Re: Q3 update");
   });
 });

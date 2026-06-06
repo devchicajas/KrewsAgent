@@ -27,6 +27,7 @@ import {
   formatInboxMessageContent,
   isGmailConnected,
 } from "@/lib/gmail/fetchInbox";
+import { buildGmailReplyContext, type GmailReplyContext } from "@/lib/gmail/replyContext";
 
 export interface RunPipelineInput {
   userId: string;
@@ -60,6 +61,7 @@ async function collectContext(
   items: { id: string; content: string }[];
   growthInput?: string;
   opsInboxSource: OpsInboxSource;
+  gmailReplyContext?: Map<string, GmailReplyContext>;
 }> {
   const supabase = createServiceClient();
   const { data: founder } = await supabase
@@ -81,6 +83,7 @@ async function collectContext(
           })),
           growthInput: undefined,
           opsInboxSource: "gmail_live",
+          gmailReplyContext: buildGmailReplyContext(messages),
         };
       }
       if (live && messages.length === 0) {
@@ -213,7 +216,7 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
   });
 
   try {
-    const { founder, items, opsInboxSource } = await collectContext(
+    const { founder, items, opsInboxSource, gmailReplyContext } = await collectContext(
       userId,
       agentType,
       growthInput
@@ -300,7 +303,8 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
       agentType,
       output,
       processedItems,
-      usedFallback
+      usedFallback,
+      gmailReplyContext
     );
 
     return {
