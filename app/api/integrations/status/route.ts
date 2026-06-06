@@ -78,7 +78,7 @@ export const GET = withSecurity(
         github_login: auth.isDemo
           ? null
           : (githubIntegration?.github_login ?? null),
-        can_comment_on_approve: githubOAuthConnected && selected_by_user,
+        can_comment_on_approve: githubOAuthConnected && githubLive,
       },
       slack: {
         connected: false,

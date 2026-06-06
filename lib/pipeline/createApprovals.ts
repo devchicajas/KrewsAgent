@@ -13,6 +13,7 @@ import {
   replySubject,
 } from "@/lib/gmail/replyContext";
 import { ensureOptionalReplyDrafts } from "@/lib/pipeline/ensureOptionalReplyDraft";
+import { attachGitHubIssuePayload } from "@/lib/github/issuePayload";
 
 function attachGmailThreadPayload(
   payload: Record<string, unknown>,
@@ -49,7 +50,8 @@ export async function createApprovalsFromOutput(
   output: AgentRunOutput,
   processedItems: UntrustedItem[],
   usedFallback: boolean,
-  gmailReplyContext?: Map<string, GmailReplyContext>
+  gmailReplyContext?: Map<string, GmailReplyContext>,
+  githubIssuesLive?: boolean
 ): Promise<string[]> {
   const enriched =
     agentType === "ops"
@@ -87,6 +89,15 @@ export async function createApprovalsFromOutput(
         payload.to = extractEmailAddress(payload.to);
       }
       payload = attachGmailThreadPayload(payload, gmailReplyContext);
+    }
+
+    if (card.action_type === "draft_support_reply") {
+      payload = attachGitHubIssuePayload(
+        payload,
+        card,
+        processedItems,
+        githubIssuesLive
+      );
     }
 
     const { data, error } = await supabase

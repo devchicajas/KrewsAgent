@@ -85,6 +85,7 @@ export const POST = withSecurity(
       used_fallback: result.usedFallback,
       fallback_reason: result.fallbackReason ?? null,
       ops_inbox_source: result.opsInboxSource,
+      github_issues_source: result.githubIssuesSource,
       approvals: approvals ?? [],
       stats: {
         ...result.output.stats,

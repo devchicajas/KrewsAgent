@@ -43,6 +43,7 @@ export interface RunPipelineResult {
   fallbackReason: FallbackReason;
   approvalIds: string[];
   opsInboxSource?: OpsInboxSource;
+  githubIssuesSource?: GitHubIssuesSource;
 }
 
 export type OpsInboxSource =
@@ -51,6 +52,11 @@ export type OpsInboxSource =
   | "gmail_error"
   | "demo_seed"
   | "not_ops";
+
+export type GitHubIssuesSource =
+  | "github_live"
+  | "github_fixture"
+  | "not_support";
 
 async function collectContext(
   userId: string,
@@ -62,6 +68,8 @@ async function collectContext(
   growthInput?: string;
   opsInboxSource: OpsInboxSource;
   gmailReplyContext?: Map<string, GmailReplyContext>;
+  githubIssuesLive: boolean;
+  githubIssuesSource: GitHubIssuesSource;
 }> {
   const supabase = createServiceClient();
   const { data: founder } = await supabase
@@ -84,6 +92,8 @@ async function collectContext(
           growthInput: undefined,
           opsInboxSource: "gmail_live",
           gmailReplyContext: buildGmailReplyContext(messages),
+          githubIssuesLive: false,
+          githubIssuesSource: "not_support",
         };
       }
       if (live && messages.length === 0) {
@@ -96,6 +106,8 @@ async function collectContext(
           items,
           growthInput: undefined,
           opsInboxSource: "gmail_empty",
+          githubIssuesLive: false,
+          githubIssuesSource: "not_support",
         };
       }
       if (!live) {
@@ -108,6 +120,8 @@ async function collectContext(
           items,
           growthInput: undefined,
           opsInboxSource: "gmail_error",
+          githubIssuesLive: false,
+          githubIssuesSource: "not_support",
         };
       }
     }
@@ -115,7 +129,14 @@ async function collectContext(
       id: e.id,
       content: formatSeedEmailContent(e),
     }));
-    return { founder, items, growthInput: undefined, opsInboxSource: "demo_seed" };
+    return {
+      founder,
+      items,
+      growthInput: undefined,
+      opsInboxSource: "demo_seed",
+      githubIssuesLive: false,
+      githubIssuesSource: "not_support",
+    };
   }
 
   if (agentType === "growth") {
@@ -124,6 +145,8 @@ async function collectContext(
       items: [{ id: "growth-input", content: growthInput ?? "" }],
       growthInput,
       opsInboxSource: "not_ops",
+      githubIssuesLive: false,
+      githubIssuesSource: "not_support",
     };
   }
 
@@ -133,11 +156,13 @@ async function collectContext(
       items: [],
       growthInput: undefined,
       opsInboxSource: "not_ops",
+      githubIssuesLive: false,
+      githubIssuesSource: "not_support",
     };
   }
 
   // support — live GitHub issues (per-user OAuth when connected)
-  const { issues } = await fetchOpenIssues(userId);
+  const { issues, live: githubIssuesLive } = await fetchOpenIssues(userId);
   return {
     founder,
     items: issues.map((i) => ({
@@ -145,7 +170,9 @@ async function collectContext(
       content: formatIssueContent(i),
     })),
     growthInput: undefined,
-    opsInboxSource: "not_ops",
+    opsInboxSource: "not_support",
+    githubIssuesLive,
+    githubIssuesSource: githubIssuesLive ? "github_live" : "github_fixture",
   };
 }
 
@@ -216,11 +243,14 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
   });
 
   try {
-    const { founder, items, opsInboxSource, gmailReplyContext } = await collectContext(
-      userId,
-      agentType,
-      growthInput
-    );
+    const {
+      founder,
+      items,
+      opsInboxSource,
+      gmailReplyContext,
+      githubIssuesLive,
+      githubIssuesSource,
+    } = await collectContext(userId, agentType, growthInput);
     const { fenced, items: processedItems } = fenceExternalContent(items);
     const playbook = PROMPTS.playbooks[agentType];
 
@@ -304,7 +334,8 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
       output,
       processedItems,
       usedFallback,
-      gmailReplyContext
+      gmailReplyContext,
+      agentType === "support" ? githubIssuesLive : undefined
     );
 
     return {
@@ -313,6 +344,7 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
       fallbackReason,
       approvalIds,
       opsInboxSource: agentType === "ops" ? opsInboxSource : undefined,
+      githubIssuesSource: agentType === "support" ? githubIssuesSource : undefined,
     };
   } catch (err) {
     // Last resort: DEMO_MODE must never return a dead run

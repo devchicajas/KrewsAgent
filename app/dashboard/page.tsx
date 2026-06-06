@@ -48,6 +48,17 @@ function opsInboxLabel(source: string | undefined): string | null {
   }
 }
 
+function githubIssuesLabel(source: string | undefined): string | null {
+  switch (source) {
+    case "github_live":
+      return "Support read live GitHub issues from your connected repo — approving posts comments on the matching issue.";
+    case "github_fixture":
+      return "GitHub not live for this run (not connected, wrong repo, or API error) — demo issues shown; approve logs only until you connect and pick your repo on Connect.";
+    default:
+      return null;
+  }
+}
+
 function mapApprovalRows(raw: unknown[]): ApprovalRow[] {
   return raw.map((row) => {
     const r = row as Record<string, unknown>;
@@ -85,6 +96,7 @@ export default function DashboardPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [liveMessage, setLiveMessage] = useState("");
   const [opsInboxNote, setOpsInboxNote] = useState<string | null>(null);
+  const [githubIssuesNote, setGithubIssuesNote] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [founderName, setFounderName] = useState("Jordan");
   const [isDemo, setIsDemo] = useState(false);
@@ -252,6 +264,11 @@ export default function DashboardPage() {
       setOpsInboxNote(
         selectedCrew === "ops"
           ? opsInboxLabel(data.ops_inbox_source as string | undefined)
+          : null
+      );
+      setGithubIssuesNote(
+        selectedCrew === "support"
+          ? githubIssuesLabel(data.github_issues_source as string | undefined)
           : null
       );
       setRunState("success");
@@ -459,6 +476,9 @@ export default function DashboardPage() {
 
       {opsInboxNote && selectedCrew === "ops" && runState === "success" && (
         <p className="text-base mb-3 text-matcha-bright">{opsInboxNote}</p>
+      )}
+      {githubIssuesNote && selectedCrew === "support" && runState === "success" && (
+        <p className="text-base mb-3 text-matcha-bright">{githubIssuesNote}</p>
       )}
 
       {showPipeline && (

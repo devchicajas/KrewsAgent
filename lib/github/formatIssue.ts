@@ -5,9 +5,12 @@ const MAX_ISSUE_CHARS = 5000;
 const MAX_COMMENTS_SHOWN = 8;
 
 export function formatIssueContent(issue: GitHubIssueItem): string {
-  let out = `Issue #${issue.number} (opened by ${issue.user}): ${issue.title}\n\n${
-    issue.body?.trim() || "(no description)"
-  }`;
+  const header = [
+    `Item-ID: ${issue.id}`,
+    `Issue #${issue.number} (opened by ${issue.user}): ${issue.title}`,
+  ].join("\n");
+
+  let out = `${header}\n\n${issue.body?.trim() || "(no description)"}`;
 
   const comments = issue.comments ?? [];
   if (comments.length > 0) {

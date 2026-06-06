@@ -151,16 +151,20 @@ export async function executeApproval(
   }
 
   if (claimed.action_type === "draft_support_reply") {
-    const commentResult = await tryPostIssueComment(
-      userId,
-      payload,
-      claimed.preview
-    );
-    if (commentResult.created) {
-      sideEffectNote = "github_comment_posted";
-      githubCommentUrl = commentResult.commentUrl;
+    if (payload.github_live === false) {
+      sideEffectNote = "logged_only:github_fixture_issues";
     } else {
-      sideEffectNote = `logged_only:${commentResult.reason ?? "github_not_connected"}`;
+      const commentResult = await tryPostIssueComment(
+        userId,
+        payload,
+        claimed.preview
+      );
+      if (commentResult.created) {
+        sideEffectNote = "github_comment_posted";
+        githubCommentUrl = commentResult.commentUrl;
+      } else {
+        sideEffectNote = `logged_only:${commentResult.reason ?? "github_not_connected"}`;
+      }
     }
   }
 
@@ -200,7 +204,11 @@ export async function executeApproval(
               ? claimed.action_type === "draft_email"
                 ? "Logged to audit — connect Gmail to create drafts in your inbox"
                 : claimed.action_type === "draft_support_reply"
-                  ? "Logged to audit — connect GitHub to post comments on approve"
+                  ? sideEffectNote === "logged_only:github_fixture_issues"
+                    ? "Logged to audit — demo/fixture issues only; connect GitHub, pick your repo, and re-run Support for live comments"
+                    : sideEffectNote === "logged_only:missing_issue_number"
+                      ? "Logged to audit — could not match this reply to a GitHub issue number"
+                      : "Logged to audit — connect GitHub on /connect to post comments on approve"
                   : "Logged to audit"
               : claimed.action_type === "security_advisory"
                 ? "Advisory acknowledged — logged to audit"
