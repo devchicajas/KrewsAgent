@@ -12,7 +12,7 @@ const config: Config = {
         mono: ["'Courier New'", "Courier", "monospace"],
       },
       fontSize: {
-        /* 20px root — rem-based scale across the app */
+        /* 14px root — rem-based scale across the app */
         xs: ["0.9rem", { lineHeight: "1.45" }],
         sm: ["0.95rem", { lineHeight: "1.5" }],
         base: ["1rem", { lineHeight: "1.55" }],
