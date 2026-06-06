@@ -1,0 +1,5 @@
+Your previous response was not valid JSON matching AgentRunOutput. Return ONLY the corrected JSON.
+No explanation, no code fences. Do NOT use "actions" — use "approval_cards". Each card needs:
+agent_type, action_title, action_type, risk_level, reasoning, preview, consequence_approve,
+consequence_reject, payload. Top-level: run_summary, stats (with actions_executed: 0),
+deferred_items, security_notes, tars_model.

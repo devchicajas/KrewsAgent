@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KrewsAgent.exe - Strawberry Matcha Wireframe</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  font-family: 'Courier New', monospace; 
+  background: #1a1014; 
+  color: #fff8fa;
+  padding: 10px;
+}
+body.light { 
+  background: #fff5f7; 
+  color: #1a1014;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #1a1014;
+  border: 4px solid #c04060;
+  box-shadow: inset 2px 2px 0 #ffc0d0, inset -2px -2px 0 #4a1f2a;
+}
+body.light .container {
+  background: #ffffff;
+  border-color: #c04060;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #9b6bc8;
+}
+
+.titlebar {
+  background: linear-gradient(90deg, #c04060 0%, #3d6b4f 100%);
+  color: #fff;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+  border-bottom: 3px solid #1a1014;
+  cursor: default;
+}
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.title-icon {
+  width: 20px;
+  height: 20px;
+  background: #7dbf8e;
+  border: 2px outset #ffc0d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #1a1014;
+}
+
+.title-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.title-button {
+  width: 20px;
+  height: 18px;
+  background: #ffc0d0;
+  border: 2px outset #fff8fa;
+  color: #1a1014;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-button:active {
+  border-style: inset;
+}
+
+.menubar {
+  background: #4a1f2a;
+  border-bottom: 3px solid #1a1014;
+  padding: 4px 8px;
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+body.light .menubar { background: #f5d0d8; }
+
+.menu-item {
+  background: transparent;
+  border: none;
+  color: #fff8fa;
+  padding: 4px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+body.light .menu-item { color: #1a1014; }
+
+.menu-item:hover, .menu-item.active {
+  background: #7dbf8e;
+  color: #1a1014;
+  border: 1px outset #ffc0d0;
+}
+
+.theme-toggle {
+  margin-left: auto;
+  background: #1a1014;
+  border: 2px outset #c04060;
+  padding: 3px 10px;
+  color: #fff8fa;
+}
+body.light .theme-toggle { 
+  background: #ffffff;
+  color: #1a1014;
+}
+
+.screen { display: none; padding: 20px; min-height: 500px; }
+.screen.active { display: block; }
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 32px 24px;
+  background: #140c10;
+  border: 4px ridge #c04060;
+  margin-bottom: 16px;
+}
+body.light .hero { background: #ffffff; }
+
+.hero-blink {
+  font-size: 11px;
+  color: #7dbf8e;
+  font-weight: bold;
+  margin-bottom: 16px;
+  letter-spacing: 0.2em;
+  animation: blink 1.4s infinite;
+}
+@keyframes blink { 50% { opacity: 0.3; } }
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: 900;
+  margin: 0 0 16px;
+  text-shadow: 3px 3px 0 #c04060, 6px 6px 0 #3d6b4f;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+body.light .hero h1 { text-shadow: 3px 3px 0 #ffc0d0, 6px 6px 0 #7dbf8e; }
+
+.hero h1 .accent { color: #7dbf8e; }
+body.light .hero h1 .accent { color: #3d6b4f; }
+
+.hero p {
+  font-size: 13px;
+  color: #ffc0d0;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+body.light .hero p { color: #5a1830; }
+
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.btn {
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 10px 24px;
+  border: 3px outset #ffc0d0;
+}
+
+.btn:active { border-style: inset; }
+
+.btn-primary {
+  background: #7dbf8e;
+  color: #1a1014;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.btn-secondary {
+  background: #c04060;
+  color: #fff;
+}
+
+.marquee {
+  background: #1a1014;
+  border: 2px inset #c04060;
+  padding: 8px;
+  overflow: hidden;
+  font-size: 11px;
+  color: #7dbf8e;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+body.light .marquee { background: #fff5f7; color: #3d6b4f; }
+
+.marquee-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll 24s linear infinite;
+}
+@keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+.section-label {
+  background: #c04060;
+  color: #fff;
+  padding: 8px 14px;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  border: 2px outset #ffc0d0;
+  margin: 16px 0 12px;
+  text-transform: uppercase;
+}
+
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+
+.card {
+  background: #140c10;
+  border: 3px ridge #c04060;
+  padding: 12px;
+}
+body.light .card { background: #ffffff; }
+
+.card.crew-green { border-color: #7dbf8e; }
+.card.crew-strawberry { border-color: #ffc0d0; }
+.card.crew-matcha { border-color: #7dbf8e; }
+
+.card-label {
+  font-size: 11px;
+  color: #7dbf8e;
+  font-weight: bold;
+  margin-bottom: 6px;
+  letter-spacing: 0.1em;
+}
+body.light .card-label { color: #3d6b4f; }
+
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: #ffc0d0;
+  line-height: 1.5;
+}
+body.light .card-desc { color: #5a1830; }
+
+.badge {
+  display: inline-block;
+  font-size: 9px;
+  padding: 4px 10px;
+  background: #7dbf8e;
+  color: #1a1014;
+  font-weight: bold;
+  border: 2px outset #ffc0d0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge.soon { background: #ffc0d0; }
+
+.story {
+  background: #140c10;
+  border: 4px ridge #ffc0d0;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+body.light .story { background: #ffffff; }
+
+.avatar {
+  background: #c04060;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7dbf8e;
+  font-size: 36px;
+  font-weight: 900;
+  border: 4px ridge #ffc0d0;
+  margin: 0 auto;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.role {
+  font-size: 11px;
+  color: #ffc0d0;
+  text-align: center;
+}
+body.light .role { color: #5a1830; }
+
+.quote {
+  font-size: 13px;
+  line-height: 1.65;
+  padding: 12px;
+  background: #1a1014;
+  border: 2px inset #c04060;
+  font-style: italic;
+}
+body.light .quote { background: #fff5f7; }
+
+.cta-box {
+  background: #140c10;
+  padding: 24px;
+  text-align: center;
+  border: 4px ridge #7dbf8e;
+  margin-bottom: 14px;
+}
+body.light .cta-box { background: #ffffff; }
+
+.cta-h { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+.cta-s { font-size: 12px; color: #ffc0d0; margin-bottom: 16px; }
+body.light .cta-s { color: #5a1830; }
+
+.footer {
+  background: #4a1f2a;
+  padding: 8px 12px;
+  border-top: 3px solid #1a1014;
+  font-size: 10px;
+  color: #ffc0d0;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body.light .footer { background: #f5d0d8; color: #5a1830; }
+
+.footer-tars { color: #7dbf8e; font-weight: bold; }
+body.light .footer-tars { color: #3d6b4f; }
+
+/* DASHBOARD */
+.page-h { font-size: 22px; font-weight: bold; margin: 0 0 6px; text-shadow: 2px 2px 0 #c04060; }
+body.light .page-h { text-shadow: 2px 2px 0 #ffc0d0; }
+
+.page-s { font-size: 12px; color: #ffc0d0; margin: 0 0 16px; }
+body.light .page-s { color: #5a1830; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+
+.stat {
+  background: #140c10;
+  padding: 12px;
+  text-align: center;
+  border: 3px inset #c04060;
+}
+body.light .stat { background: #ffffff; }
+
+.stat-num { font-size: 24px; font-weight: bold; color: #7dbf8e; }
+body.light .stat-num { color: #3d6b4f; }
+
+.stat-label { font-size: 10px; color: #ffc0d0; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.1em; }
+body.light .stat-label { color: #5a1830; }
+
+.crew-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.crew-btn {
+  flex: 1;
+  min-width: 110px;
+  background: #140c10;
+  border: 3px outset #c04060;
+  padding: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff8fa;
+}
+body.light .crew-btn { background: #ffffff; color: #1a1014; }
+
+.crew-btn:hover { background: #1a1014; }
+body.light .crew-btn:hover { background: #fff0f3; }
+
+.crew-btn.active {
+  border-style: inset;
+  background: #4a1f2a;
+}
+body.light .crew-btn.active { background: #f5d0d8; }
+
+.crew-btn.matcha { border-color: #3d6b4f; }
+.crew-btn.strawberry { border-color: #ffc0d0; }
+.crew-btn.matcha-alt { border-color: #9ee8b0; }
+
+.crew-btn-label { font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+.crew-btn-status { font-size: 10px; color: #7dbf8e; text-transform: uppercase; letter-spacing: 0.08em; }
+body.light .crew-btn-status { color: #3d6b4f; }
+
+.crew-btn-status.read { color: #ffc0d0; }
+
+.run-btn {
+  display: block;
+  width: 100%;
+  background: #7dbf8e;
+  color: #1a1014;
+  border: 4px outset #ffc0d0;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 16px;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.run-btn:active { border-style: inset; }
+.run-btn:disabled { background: #4a1f2a; color: #e8d4dc; cursor: not-allowed; border-style: inset; text-shadow: none; }
+
+.pipeline {
+  background: #140c10;
+  border: 3px inset #c04060;
+  padding: 12px;
+  margin-bottom: 16px;
+  display: none;
+  font-size: 12px;
+}
+body.light .pipeline { background: #ffffff; }
+
+.pipeline.active { display: block; }
+
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  color: #e8d4dc;
+}
+
+.pipeline-step.done { color: #7dbf8e; }
+.pipeline-step.active { font-weight: bold; color: #fff8fa; }
+
+.pipeline-dot {
+  width: 10px;
+  height: 10px;
+  background: #4a1f2a;
+  border: 1px solid #c04060;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #fff;
+}
+
+.pipeline-step.done .pipeline-dot {
+  background: #7dbf8e;
+  color: #1a1014;
+}
+
+.pipeline-step.done .pipeline-dot::after { content: '✓'; }
+
+.pipeline-step.active .pipeline-dot {
+  background: #ffc0d0;
+  color: #1a1014;
+  animation: pulse 0.6s infinite;
+}
+
+.pipeline-step.active .pipeline-dot::after { content: '>'; }
+
+@keyframes pulse { 50% { background: #7dbf8e; } }
+
+.empty-state {
+  background: #140c10;
+  border: 3px dashed #c04060;
+  padding: 32px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+body.light .empty-state { background: #ffffff; }
+
+.empty-title { font-size: 13px; color: #ffc0d0; font-weight: bold; margin-bottom: 8px; }
+body.light .empty-title { color: #5a1830; }
+
+.empty-sub { font-size: 11px; color: #7dbf8e; }
+
+.approval-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+
+.approval-card {
+  background: #140c10;
+  border: 3px ridge #ffc0d0;
+  padding: 14px;
+}
+body.light .approval-card { background: #ffffff; }
+
+.approval-card.approved { border-color: #7dbf8e; opacity: 0.75; }
+.approval-card.rejected { border-color: #c04040; opacity: 0.75; }
+
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
+
+.card-title { font-size: 13px; font-weight: bold; }
+
+.risk-badge {
+  font-size: 9px;
+  padding: 3px 8px;
+  font-weight: bold;
+  border: 2px outset #ffc0d0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.risk-low { background: #7dbf8e; color: #1a1014; }
+.risk-med { background: #ffc0d0; color: #1a1014; }
+.risk-high { background: #c04040; color: #fff; }
+
+.card-why { font-size: 12px; color: #ffc0d0; margin-bottom: 8px; line-height: 1.5; }
+body.light .card-why { color: #5a1830; }
+
+.card-why b { color: #7dbf8e; }
+body.light .card-why b { color: #3d6b4f; }
+
+.card-preview {
+  background: #1a1014;
+  padding: 10px;
+  font-size: 11px;
+  color: #fff8fa;
+  margin-bottom: 10px;
+  line-height: 1.5;
+  border: 2px inset #c04060;
+  white-space: pre-wrap;
+}
+body.light .card-preview { background: #fff5f7; color: #1a1014; }
+
+.card-cons { font-size: 11px; color: #ffc0d0; margin-bottom: 10px; line-height: 1.5; }
+body.light .card-cons { color: #5a1830; }
+
+.card-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.card-btn {
+  font-size: 11px;
+  padding: 6px 14px;
+  border: 3px outset #ffc0d0;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-btn:active { border-style: inset; }
+
+.card-btn.approve { background: #7dbf8e; color: #1a1014; }
+.card-btn.reject { background: #c04040; color: #fff; }
+
+.resolved {
+  font-size: 11px;
+  color: #7dbf8e;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.resolved.no { color: #ffc0d0; }
+
+.security-bar {
+  background: #1a1014;
+  border: 3px inset #c04060;
+  padding: 10px 14px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #7dbf8e;
+  margin-bottom: 12px;
+}
+body.light .security-bar { background: #fff5f7; color: #3d6b4f; }
+
+.security-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.security-row::before { content: '>'; color: #ffc0d0; font-weight: bold; }
+
+.tars-badge {
+  font-size: 11px;
+  color: #ffc0d0;
+  text-align: center;
+  padding: 10px;
+  background: #140c10;
+  border: 2px ridge #7dbf8e;
+  display: none;
+  margin-bottom: 12px;
+}
+body.light .tars-badge { background: #ffffff; color: #5a1830; }
+
+.tars-badge.active { display: block; }
+
+.tars-badge b { color: #7dbf8e; font-weight: bold; }
+body.light .tars-badge b { color: #3d6b4f; }
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.action-btn {
+  font-size: 11px;
+  background: #4a1f2a;
+  color: #ffc0d0;
+  border: 2px outset #c04060;
+  padding: 5px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+body.light .action-btn { background: #ffffff; color: #5a1830; }
+
+.action-btn:active { border-style: inset; }
+
+.log-table {
+  background: #140c10;
+  border: 3px inset #c04060;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+body.light .log-table { background: #ffffff; }
+
+.log-row {
+  display: grid;
+  grid-template-columns: 170px 90px 1fr 100px;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 2px solid #4a1f2a;
+  font-size: 12px;
+  align-items: center;
+}
+body.light .log-row { border-bottom-color: #f5d0d8; }
+
+.log-row.header {
+  font-weight: bold;
+  color: #7dbf8e;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #1a1014;
+}
+body.light .log-row.header { background: #ffffff; color: #3d6b4f; }
+
+.log-time { color: #ffc0d0; font-size: 11px; }
+body.light .log-time { color: #5a1830; }
+
+.log-agent { color: #7dbf8e; font-weight: bold; text-transform: uppercase; }
+body.light .log-agent { color: #3d6b4f; }
+
+.log-status {
+  font-size: 10px;
+  padding: 3px 8px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 2px outset #ffc0d0;
+}
+
+.log-status.approved { background: #7dbf8e; color: #1a1014; }
+.log-status.rejected { background: #c04040; color: #fff; }
+.log-status.pending { background: #ffc0d0; color: #1a1014; }
+
+@media (max-width: 600px) {
+  .grid-3, .grid-2 { grid-template-columns: 1fr 1fr; }
+  .story { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .log-row { grid-template-columns: 130px 1fr 80px; font-size: 11px; }
+  .log-agent { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="titlebar">
+    <button class="titlebar-left" onclick="showScreen('landing')">
+      <span class="title-icon">K</span>
+      KREWSAGENT.EXE — Work done. Control kept.
+    </button>
+    <div class="title-buttons">
+      <div class="title-button">_</div>
+      <div class="title-button">□</div>
+      <div class="title-button">×</div>
+    </div>
+  </div>
+
+  <div class="menubar">
+    <button class="menu-item" onclick="showScreen('landing')">Home</button>
+    <button class="menu-item" id="menu-dashboard" onclick="showScreen('dashboard')">Dashboard</button>
+    <button class="menu-item" id="menu-activity" onclick="showScreen('activity')">Activity</button>
+    <button class="menu-item theme-toggle" onclick="toggleTheme()">[ Light Mode ]</button>
+  </div>
+
+  <!-- LANDING SCREEN -->
+  <div id="landing" class="screen active">
+    <div class="hero">
+      <div class="hero-blink">★ TETRATE AI BUILDATHON v2.0 · BUILT SOLO ★</div>
+      <h1>Work done.<br><span class="accent">Control kept.</span></h1>
+      <p>>>> A secure AI operations crew for founders who can't afford a team yet. It reads, drafts, and proposes — but waits for you to say yes. <<<</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="showScreen('dashboard')">[ TRY THE DEMO ]</button>
+        <button class="btn btn-secondary">[ 60-SEC DEMO ]</button>
+      </div>
+    </div>
+
+    <div class="marquee"><span class="marquee-track">★ APPROVAL GATE ON EVERY ACTION ★ NO DATA USED FOR AI TRAINING ★ FULL AUDIT TRAIL ★ POWERED BY TARS ★ EXTERNAL CONTENT TREATED AS UNTRUSTED ★</span></div>
+
+    <div class="section-label">>> HOW IT WORKS</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-label">[ 01 ]</div>
+        <div class="card-title">CONNECT STACK</div>
+        <div class="card-desc">Gmail and GitHub. One tap each.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">[ 02 ]</div>
+        <div class="card-title">PICK YOUR CREW</div>
+        <div class="card-desc">Ops, Growth, Support, Finance.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">[ 03 ]</div>
+        <div class="card-title">CREW GETS TO WORK</div>
+        <div class="card-desc">Reviews, drafts — you approve.</div>
+      </div>
+    </div>
+
+    <div class="section-label">>> YOUR CREW</div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="card-title">[ OPS ]</div>
+          <div class="badge">ACTIVE</div>
+        </div>
+        <div class="card-desc">Reviews inbox + GitHub. Drafts investor updates. Proposes follow-ups.</div>
+      </div>
+      <div class="card crew-green">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="card-title">[ GROWTH ]</div>
+          <div class="badge">READY</div>
+        </div>
+        <div class="card-desc">Turns shipped features into LinkedIn posts and outreach drafts.</div>
+      </div>
+      <div class="card crew-strawberry">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="card-title">[ SUPPORT ]</div>
+          <div class="badge">READY</div>
+        </div>
+        <div class="card-desc">Reads customer tickets. Drafts responses in your tone.</div>
+      </div>
+      <div class="card crew-matcha">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div class="card-title">[ FINANCE ]</div>
+          <div class="badge soon">READ-ONLY</div>
+        </div>
+        <div class="card-desc">Tracks runway, burn, MRR. Plain-English summary.</div>
+      </div>
+    </div>
+
+    <div class="section-label">>> BUILT FOR</div>
+    <div class="story">
+      <div>
+        <div class="avatar">J</div>
+        <div class="name">JORDAN</div>
+        <div class="role">Caregiver · Side-stacker</div>
+      </div>
+      <div class="quote">"It's 11pm. I just put my mom to bed. 47 unread emails, a customer needing help, an investor follow-up due tomorrow. I open KrewsAgent — by morning, my crew has read everything and drafted what I need. They're waiting for me to say yes."</div>
+    </div>
+
+    <div class="section-label">>> SECURITY & PRIVACY</div>
+    <div class="grid-2">
+      <div class="card crew-green">
+        <div class="card-title">[ ♦ ] APPROVAL GATE</div>
+        <div class="card-desc">Every send waits for your tap. Agent drafts. You decide.</div>
+      </div>
+      <div class="card crew-green">
+        <div class="card-title">[ █ ] NO AI TRAINING</div>
+        <div class="card-desc">Routed through TARS. Content never touches training.</div>
+      </div>
+      <div class="card crew-green">
+        <div class="card-title">[ ○ ] MIN RETENTION</div>
+        <div class="card-desc">Raw inbox processed live, never stored.</div>
+      </div>
+      <div class="card crew-green">
+        <div class="card-title">[ ≡ ] AUDIT TRAIL</div>
+        <div class="card-desc">Every decision logged with reasoning and model used.</div>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-h">>>> STOP DROWNING IN ADMIN <<<</div>
+      <div class="cta-s">No signup required. Powered by TARS.</div>
+      <button class="btn btn-primary" onclick="showScreen('dashboard')">[ OPEN DASHBOARD ]</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboard" class="screen">
+    <h1 class="page-h">>> GOOD MORNING, JAS</h1>
+    <p class="page-s">Your crew is ready. Pick a crew, then RUN CREW.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="stat-reviewed">17</div><div class="stat-label">Reviewed</div></div>
+      <div class="stat"><div class="stat-num" id="stat-proposed">0</div><div class="stat-label">Proposed</div></div>
+      <div class="stat"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending</div></div>
+      <div class="stat"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
+    </div>
+
+    <div class="crew-buttons">
+      <button class="crew-btn active" onclick="selectCrew('ops')" id="crew-ops"><div class="crew-btn-label">OPS</div><div class="crew-btn-status">Active</div></button>
+      <button class="crew-btn matcha" onclick="selectCrew('growth')" id="crew-growth"><div class="crew-btn-label">GROWTH</div><div class="crew-btn-status">Ready</div></button>
+      <button class="crew-btn strawberry" onclick="selectCrew('support')" id="crew-support"><div class="crew-btn-label">SUPPORT</div><div class="crew-btn-status">Ready</div></button>
+      <button class="crew-btn matcha-alt" onclick="selectCrew('finance')" id="crew-finance"><div class="crew-btn-label">FINANCE</div><div class="crew-btn-status read">Read-only</div></button>
+    </div>
+
+    <button class="run-btn" id="run-button" onclick="runCrew()">▶ RUN OPS CREW</button>
+
+    <div class="pipeline" id="pipeline">
+      <div class="pipeline-step" id="pipe-1"><span class="pipeline-dot"></span>Reading founder context</div>
+      <div class="pipeline-step" id="pipe-2"><span class="pipeline-dot"></span>Reviewing inbox and GitHub</div>
+      <div class="pipeline-step" id="pipe-3"><span class="pipeline-dot"></span>Classifying priority items</div>
+      <div class="pipeline-step" id="pipe-4"><span class="pipeline-dot"></span>Evaluating risk level</div>
+      <div class="pipeline-step" id="pipe-5"><span class="pipeline-dot"></span>Drafting through TARS</div>
+      <div class="pipeline-step" id="pipe-6"><span class="pipeline-dot"></span>Queuing for approval</div>
+      <div class="pipeline-step" id="pipe-7"><span class="pipeline-dot"></span>Writing audit log</div>
+    </div>
+
+    <div id="empty-state" class="empty-state">
+      <div class="empty-title">[ NO PENDING APPROVALS ]</div>
+      <div class="empty-sub">Run your crew to review your workspace</div>
+    </div>
+
+    <div id="cards" class="approval-cards"></div>
+
+    <div class="security-bar">
+      <div class="security-row"><span id="sec-approved">0 actions executed without your approval</span></div>
+      <div class="security-row">External content treated as untrusted input</div>
+      <div class="security-row">Your data is never used to train AI models</div>
+      <div class="security-row">Demo Privacy Mode active</div>
+    </div>
+
+    <div class="tars-badge" id="tars">>>> ROUTED VIA TARS → <b>claude-sonnet-4-6</b> <<<</div>
+
+    <div class="action-buttons">
+      <button class="action-btn" onclick="resetDemo()">[ RESET DEMO ]</button>
+      <button class="action-btn" onclick="clearDemo()">[ CLEAR DATA ]</button>
+      <button class="action-btn" onclick="showScreen('activity')">[ ACTIVITY LOG → ]</button>
+    </div>
+  </div>
+
+  <!-- ACTIVITY SCREEN -->
+  <div id="activity" class="screen">
+    <h1 class="page-h">>> ACTIVITY LOG</h1>
+    <p class="page-s">Every decision your crew made, with reasoning and AI model used.</p>
+
+    <div class="log-table">
+      <div class="log-row header">
+        <div>Date · Time</div>
+        <div>Agent</div>
+        <div>Action</div>
+        <div style="text-align: center;">Status</div>
+      </div>
+      <div id="log"></div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-btn" onclick="showScreen('dashboard')">[ ← BACK TO DASHBOARD ]</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>© 2026 KREWSAGENT.EXE · Tetrate AI Buildathon</div>
+    <div><span class="footer-tars">[ POWERED BY TARS ]</span></div>
+  </div>
+</div>
+
+<script>
+const cards = {
+  ops: [
+    { title: 'Investor update ready', risk: 'med', why: 'Investor email asking for Q3 update. 4 PRs merged, MRR +$340.', preview: 'Hey Sarah,\n\nQuick Q3 snapshot:\n• 4 features shipped\n• MRR up $340 to $1,240\n• 8 months runway\n\nThursday 2pm works.\n\n— Jas', approve: 'Draft saved to Gmail.', reject: 'Logged. No email created.' },
+    { title: 'Follow-up meeting proposed', risk: 'low', why: 'Investor requested Thursday. Calendar shows 2-4pm open.', preview: 'Title: Investor Q3 catch-up\nWhen: Thursday 2:00–2:30 PM\nAgenda: Q3 metrics, runway', approve: 'Calendar event drafted.', reject: 'No event created.' }
+  ],
+  growth: [
+    { title: 'LinkedIn post draft', risk: 'med', why: 'You shipped approval gate UI. Audience-first founders post 3x/week.', preview: 'Most AI tools ask for your attention.\n\nKrewsAgent asks for your approval.\n\nIt does the work — waits for you to say yes.', approve: 'Draft saved.', reject: 'Discarded.' },
+    { title: 'Cold outreach sequence', risk: 'med', why: 'Pre-seed founders need 50+ touches/week.', preview: 'Email 1: "Saw your ops burnout post"\nEmail 2 (+3d): "90-sec demo?"\nEmail 3 (+5d): "Last note"', approve: 'Saved as drafts.', reject: 'Discarded.' }
+  ],
+  support: [
+    { title: 'Reply to Megan — allergy concern', risk: 'high', why: 'Customer reports dairy allergy ignored 3x. Hospital-visit risk.', preview: 'Hi Megan,\n\nSerious issue. Allergies should be hard restrictions.\n\nShipping a fix this week. Refunding last month.\n\n— Jas', approve: 'Reply sent on GitHub issue.', reject: 'Logged. No reply sent.' },
+    { title: 'Reply to David — refund request', risk: 'med', why: 'Traveled 3 weeks, no usage. Goodwill refund + vacation mode.', preview: 'Hi David,\n\nApproving August refund. Vacation mode on roadmap.\n\n— Jas', approve: 'Reply sent + refund processed.', reject: 'No action taken.' },
+    { title: 'Reply to Priya — partner sharing', risk: 'low', why: 'Feature request. Family mode + magic link workaround.', preview: 'Hi Priya,\n\nFamily mode in roadmap. Share link: forkpath.app/share/[link]\n\n— Jas', approve: 'Reply sent.', reject: 'Discarded.' }
+  ],
+  finance: [
+    { title: 'Financial health summary', risk: 'low', why: 'Read-only analysis. No approval required.', preview: '8 months runway. MRR $1,240 (+$340). Burn $4,200/mo stable. CAC $18, LTV $144.', approve: 'Read-only · No approval required', reject: '—' }
+  ]
+};
+
+let currentCrew = 'ops';
+let running = false;
+let resolved = { ops: [0, 0], growth: [0, 0], support: [0, 0, 0], finance: [0] };
+let log = [];
+let cooldown = false;
+
+function showScreen(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screen).classList.add('active');
+  document.querySelectorAll('.menu-item:not(.theme-toggle)').forEach(m => m.classList.remove('active'));
+  if (screen === 'dashboard') document.getElementById('menu-dashboard').classList.add('active');
+  if (screen === 'activity') { document.getElementById('menu-activity').classList.add('active'); renderLog(); }
+  window.scrollTo(0, 0);
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.body.classList.contains('light') ? '[ Dark Mode ]' : '[ Light Mode ]';
+}
+
+function selectCrew(crew) {
+  if (running) return;
+  currentCrew = crew;
+  document.querySelectorAll('.crew-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('crew-' + crew).classList.add('active');
+  document.getElementById('run-button').textContent = '▶ RUN ' + crew.toUpperCase() + ' CREW';
+  document.getElementById('cards').innerHTML = '';
+  document.getElementById('empty-state').style.display = 'block';
+  document.getElementById('tars').classList.remove('active');
+  document.getElementById('stat-proposed').textContent = '0';
+  document.getElementById('stat-pending').textContent = '0';
+  document.getElementById('stat-resolved').textContent = '0';
+}
+
+async function runCrew() {
+  if (running || cooldown) return;
+  running = true;
+  document.getElementById('run-button').disabled = true;
+  document.getElementById('cards').innerHTML = '';
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('pipeline').classList.add('active');
+
+  for (let i = 1; i <= 7; i++) {
+    document.querySelectorAll('.pipeline-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('pipe-' + i).classList.add('active');
+    await new Promise(r => setTimeout(r, 300));
+    document.getElementById('pipe-' + i).classList.add('done');
+  }
+  document.getElementById('pipe-7').classList.remove('active');
+
+  renderCards();
+  document.getElementById('tars').classList.add('active');
+  document.getElementById('stat-proposed').textContent = cards[currentCrew].length;
+  document.getElementById('stat-pending').textContent = cards[currentCrew].length;
+
+  const timestamp = new Date().toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true});
+  cards[currentCrew].forEach(card => log.unshift({timestamp, agent: currentCrew, action: card.title, status: 'pending'}));
+
+  running = false;
+  cooldown = true;
+  startCooldown();
+}
+
+function startCooldown() {
+  let remaining = 10;
+  const btn = document.getElementById('run-button');
+  btn.disabled = true;
+  const interval = setInterval(() => {
+    btn.textContent = '⧗ COOLING DOWN (' + remaining + 's)';
+    remaining--;
+    if (remaining < 0) {
+      clearInterval(interval);
+      cooldown = false;
+      btn.disabled = false;
+      btn.textContent = '▶ RUN AGAIN';
+    }
+  }, 1000);
+}
+
+function renderCards() {
+  const container = document.getElementById('cards');
+  const crewCards = cards[currentCrew];
+  container.innerHTML = crewCards.map((card, idx) => {
+    const isResolved = resolved[currentCrew][idx] === 1;
+    const isRejected = resolved[currentCrew][idx] === -1;
+    const isFinance = currentCrew === 'finance';
+    const riskClass = card.risk === 'low' ? 'risk-low' : card.risk === 'med' ? 'risk-med' : 'risk-high';
+    const statusClass = isResolved ? 'approved' : isRejected ? 'rejected' : '';
+
+    return `<div class="approval-card ${statusClass}">
+      <div class="card-head">
+        <div class="card-title">${card.title}</div>
+        <div class="risk-badge ${riskClass}">${card.risk}</div>
+      </div>
+      <div class="card-why"><b>WHY:</b> ${card.why}</div>
+      <div class="card-preview">${card.preview}</div>
+      ${isFinance ? '<div class="resolved">[ READ-ONLY SUMMARY · NO APPROVAL REQUIRED ]</div>' : `
+        <div class="card-cons">If approved: ${card.approve}<br>If rejected: ${card.reject}</div>
+        ${isResolved ? '<div class="resolved">[ ✓ APPROVED · LOGGED ]</div>' : isRejected ? '<div class="resolved no">[ ✗ REJECTED · LOGGED ]</div>' : `
+          <div class="card-buttons">
+            <button class="card-btn approve" onclick="approveCard('${currentCrew}', ${idx})">[ APPROVE ]</button>
+            <button class="card-btn reject" onclick="rejectCard('${currentCrew}', ${idx})">[ REJECT ]</button>
+          </div>
+        `}
+      `}
+    </div>`;
+  }).join('');
+}
+
+function approveCard(crew, idx) {
+  resolved[crew][idx] = 1;
+  renderCards();
+  updateStats();
+  updateLog(crew, idx, 'approved');
+}
+
+function rejectCard(crew, idx) {
+  resolved[crew][idx] = -1;
+  renderCards();
+  updateStats();
+  updateLog(crew, idx, 'rejected');
+}
+
+function updateLog(crew, idx, status) {
+  const action = cards[crew][idx].title;
+  const logIdx = log.findIndex(l => l.agent === crew && l.action === action && l.status === 'pending');
+  if (logIdx >= 0) log[logIdx].status = status;
+}
+
+function updateStats() {
+  const resolved_values = resolved[currentCrew];
+  const total = cards[currentCrew].length;
+  const approved = resolved_values.filter(x => x === 1).length;
+  const rejected = resolved_values.filter(x => x === -1).length;
+  document.getElementById('stat-pending').textContent = total - approved - rejected;
+  document.getElementById('stat-resolved').textContent = approved;
+}
+
+function resetDemo() {
+  resolved = {ops: [0, 0], growth: [0, 0], support: [0, 0, 0], finance: [0]};
+  log = [];
+  cooldown = false;
+  selectCrew(currentCrew);
+  document.getElementById('run-button').disabled = false;
+  document.getElementById('run-button').textContent = '▶ RUN ' + currentCrew.toUpperCase() + ' CREW';
+}
+
+function clearDemo() {
+  resetDemo();
+  document.getElementById('cards').innerHTML = '';
+  document.getElementById('empty-state').style.display = 'block';
+  document.getElementById('tars').classList.remove('active');
+}
+
+function renderLog() {
+  const logContainer = document.getElementById('log');
+  if (log.length === 0) {
+    logContainer.innerHTML = '<div style="padding: 40px 20px; text-align: center; color: #ffc0d0; font-size: 13px; font-family: inherit;">[ NO ACTIVITY YET ]</div>';
+    return;
+  }
+  logContainer.innerHTML = log.map(entry => {
+    const statusClass = entry.status === 'approved' ? 'approved' : entry.status === 'rejected' ? 'rejected' : 'pending';
+    const statusText = entry.status === 'approved' ? 'Approved' : entry.status === 'rejected' ? 'Rejected' : 'Pending';
+    return `<div class="log-row">
+      <div class="log-time">${entry.timestamp}</div>
+      <div class="log-agent">${entry.agent}</div>
+      <div>${entry.action}</div>
+      <div><div class="log-status ${statusText.toLowerCase()}">${statusText}</div></div>
+    </div>`;
+  }).join('');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+# --- secrets (NEVER commit) ---
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+service-account*.json
+
+# --- dependencies ---
+node_modules/
+.pnp
+.pnp.js
+
+# --- Next.js / build ---
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# --- testing ---
+coverage/
+.nyc_output/
+
+# --- logs / debug ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Vercel ---
+.vercel
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.cursor/
+
+# --- misc caches ---
+.turbo
+.cache/
