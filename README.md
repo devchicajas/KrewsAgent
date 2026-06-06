@@ -8,20 +8,6 @@ Your AI ops crew — for founders who can't hire help yet, but still can't affor
 
 ---
 
-## For judges — try this in 2 minutes
-
-No sign-up required:
-
-1. Open the app → click **TRY THE DEMO**
-2. Pick **OPS** → click **RUN CREW**
-3. Review the approval cards → approve or reject one
-4. Optional: switch to **GROWTH**, type what you shipped, run again
-
-You'll see the TARS badge (`>>> ROUTED VIA TARS → … <<<`) when live AI runs. If TARS is slow, demo fallback still shows the same approval flow.
-
-**What to notice:** Nothing sends or posts until you click approve. That's the whole product.
-
----
 
 ## What is KrewsAgent?
 
