@@ -91,8 +91,9 @@ export function buildGmailRawMessage(payload: EmailPayload, body: string): strin
   if (!prepared) return null;
 
   const { payload: resolved, body: cleanBody } = prepared;
-  const to = resolved.to!.trim();
-  const subject = resolved.subject?.trim() ?? "KrewsAgent draft";
+  const sanitizeHeader = (v: string) => v.replace(/[\r\n]+/g, " ").trim();
+  const to = sanitizeHeader(resolved.to!);
+  const subject = sanitizeHeader(resolved.subject ?? "KrewsAgent draft");
 
   const headerLines = [`To: ${to}`, `Subject: ${subject}`];
 

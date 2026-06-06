@@ -290,13 +290,9 @@ export default function DashboardPage() {
         }),
       });
       const data = await res.json();
-      if (data.allowed) {
-        setActionMessage(data.reason ?? "Action executed");
-        await loadApprovals();
-        await loadSecurityStats();
-      } else {
-        setActionMessage(data.reason ?? "Approval blocked");
-      }
+      setActionMessage(data.allowed ? (data.reason ?? "Action executed") : (data.reason ?? "Approval blocked"));
+      await loadApprovals();
+      await loadSecurityStats();
     } catch {
       setActionMessage("Network error — try again");
     } finally {
