@@ -170,7 +170,7 @@ async function collectContext(
       content: formatIssueContent(i),
     })),
     growthInput: undefined,
-    opsInboxSource: "not_support",
+    opsInboxSource: "not_ops",
     githubIssuesLive,
     githubIssuesSource: githubIssuesLive ? "github_live" : "github_fixture",
   };
