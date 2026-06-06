@@ -11,7 +11,7 @@ const INJECTION_PATTERNS = [
   /"action_type"\s*:/gi,
 ];
 
-const MAX_ITEM_CHARS = 2000;
+const MAX_ITEM_CHARS = 5000;
 const MAX_ITEMS = 10;
 
 export interface UntrustedItem {

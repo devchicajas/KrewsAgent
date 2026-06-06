@@ -36,7 +36,15 @@ export function withSecurity(handler: RouteHandler, options: SecurityOptions = {
 
     const origin = req.headers.get("origin");
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    if (origin && origin !== appUrl && !origin.includes("localhost")) {
+    let originAllowed = !origin || origin === appUrl || origin.includes("localhost");
+    if (!originAllowed && origin) {
+      try {
+        originAllowed = /\.vercel\.app$/i.test(new URL(origin).hostname);
+      } catch {
+        originAllowed = false;
+      }
+    }
+    if (!originAllowed) {
       return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
     }
 

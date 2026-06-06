@@ -8,7 +8,7 @@ import { DEFAULT_GROWTH_SHIPPED } from "@/lib/demo/growthDefaults";
 import { createApprovalsFromOutput } from "@/lib/pipeline/createApprovals";
 import type { AgentType } from "@/lib/types/agent";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const runSchema = z.object({

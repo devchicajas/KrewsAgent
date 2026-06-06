@@ -36,7 +36,7 @@ const PIPELINE_STAGES = [
 function opsInboxLabel(source: string | undefined): string | null {
   switch (source) {
     case "gmail_live":
-      return "Ops read live Gmail — Primary inbox, Spam, Promotions & Updates (last 14 days).";
+      return "Ops read live Gmail — inbox, spam, promotions & updates (last 14d), including prior replies in each thread.";
     case "gmail_empty":
       return "Gmail connected but inbox empty — used demo emails for this run.";
     case "gmail_error":

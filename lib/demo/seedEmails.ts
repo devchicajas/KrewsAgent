@@ -2,6 +2,12 @@
  * Demo inbox fixtures for Ops crew — in-memory only, never stored as raw bodies in DB.
  */
 
+export interface SeedEmailPriorMessage {
+  from: string;
+  date: string;
+  body: string;
+}
+
 export interface SeedEmail {
   id: string;
   from: string;
@@ -9,6 +15,8 @@ export interface SeedEmail {
   body: string;
   received_at: string;
   priority_hint?: "founder_relevant" | "noise";
+  /** Earlier messages in the same thread (demo / offline inbox) */
+  prior_messages?: SeedEmailPriorMessage[];
 }
 
 export const FOUNDER_RELEVANT_EMAILS: SeedEmail[] = [
@@ -16,6 +24,18 @@ export const FOUNDER_RELEVANT_EMAILS: SeedEmail[] = [
     id: "email-001",
     from: "sarah.chen@sequoia.com",
     subject: "Re: Q3 update — quick question on MRR",
+    prior_messages: [
+      {
+        from: "jas@krewsagent.com",
+        date: "2026-05-28",
+        body: `Hi Sarah — quick July update: MRR hit $1,240 (+$340). Shipped approval gate UI and the secure ops pipeline. Runway ~8 months.`,
+      },
+      {
+        from: "sarah.chen@sequoia.com",
+        date: "2026-05-27",
+        body: `Jas — loved the demo last week. Send a short written update when you can before our partner sync.`,
+      },
+    ],
     body: `Hi Jas,
 
 Thanks for the last update. Before our partner meeting Thursday, can you send a quick Q3 snapshot? Specifically:

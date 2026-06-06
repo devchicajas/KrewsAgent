@@ -2,16 +2,23 @@
  * KrewsAgent Secure Ops Pipeline
  * 7 stages: Context → Classify → Plan → Risk → Draft → Approval Guard → Audit
  */
-import { readFileSync } from "fs";
-import { join } from "path";
 import type { AgentType, AgentRunOutput } from "@/lib/types/agent";
+import { PROMPTS } from "@/lib/prompts";
 import { createServiceClient } from "@/lib/supabase/server";
+import { formatSeedEmailContent } from "@/lib/demo/formatSeedEmail";
 import { ALL_SEED_EMAILS } from "@/lib/demo/seedEmails";
+import { formatIssueContent } from "@/lib/github/formatIssue";
 import { getFallbackRun } from "@/lib/demo/fallbackRuns";
 import { fenceExternalContent } from "@/lib/security/untrustedInput";
 import { parseAgentRunOutput } from "@/lib/security/outputValidation";
 import { safeWriteAuditEntry } from "@/lib/security/audit";
-import { tarsChat, MODELS, extractJson } from "@/lib/tarsClient";
+import {
+  tarsChat,
+  MODELS,
+  extractJson,
+  getDraftModel,
+  getTarsRunBudgetMs,
+} from "@/lib/tarsClient";
 import { isDemoMode } from "@/lib/env";
 import { createApprovalsFromOutput } from "./createApprovals";
 import { fetchOpenIssues } from "@/lib/github/fetchIssues";
@@ -20,10 +27,6 @@ import {
   formatInboxMessageContent,
   isGmailConnected,
 } from "@/lib/gmail/fetchInbox";
-
-function loadPrompt(path: string): string {
-  return readFileSync(join(process.cwd(), path), "utf-8");
-}
 
 export interface RunPipelineInput {
   userId: string;
@@ -83,7 +86,7 @@ async function collectContext(
       if (live && messages.length === 0) {
         const items = ALL_SEED_EMAILS.map((e) => ({
           id: e.id,
-          content: `From: ${e.from}\nSubject: ${e.subject}\n\n${e.body}`,
+          content: formatSeedEmailContent(e),
         }));
         return {
           founder,
@@ -95,7 +98,7 @@ async function collectContext(
       if (!live) {
         const items = ALL_SEED_EMAILS.map((e) => ({
           id: e.id,
-          content: `From: ${e.from}\nSubject: ${e.subject}\n\n${e.body}`,
+          content: formatSeedEmailContent(e),
         }));
         return {
           founder,
@@ -107,7 +110,7 @@ async function collectContext(
     }
     const items = ALL_SEED_EMAILS.map((e) => ({
       id: e.id,
-      content: `From: ${e.from}\nSubject: ${e.subject}\n\n${e.body}`,
+      content: formatSeedEmailContent(e),
     }));
     return { founder, items, growthInput: undefined, opsInboxSource: "demo_seed" };
   }
@@ -136,11 +139,23 @@ async function collectContext(
     founder,
     items: issues.map((i) => ({
       id: i.id,
-      content: `Issue #${i.number} (${i.user}): ${i.title}\n\n${i.body}`,
+      content: formatIssueContent(i),
     })),
     growthInput: undefined,
     opsInboxSource: "not_ops",
   };
+}
+
+function safeParseTarsOutput(
+  content: string | undefined,
+  agentType: AgentType
+): AgentRunOutput | null {
+  if (!content?.trim()) return null;
+  try {
+    return parseAgentRunOutput(extractJson(content), agentType);
+  } catch {
+    return null;
+  }
 }
 
 async function callTars(
@@ -149,9 +164,9 @@ async function callTars(
   fenced: string,
   playbook: string
 ): Promise<AgentRunOutput | null> {
-  const classifySystem = loadPrompt("prompts/system/classify.system.txt");
-  const draftSystem = loadPrompt("prompts/system/draft.system.txt");
-  const repairPrompt = loadPrompt("prompts/system/json-repair.txt");
+  const classifySystem = PROMPTS.classifySystem;
+  const draftSystem = PROMPTS.draftSystem;
+  const repairPrompt = PROMPTS.jsonRepair;
 
   const founderContext = JSON.stringify(founder ?? {}, null, 2);
   const trustedUser = `FOUNDER CONTEXT (TRUSTED):\n${founderContext}\n\nPLAYBOOK (TRUSTED):\n${playbook}\n\nWORKSPACE ITEMS:\n${fenced}`;
@@ -166,14 +181,16 @@ async function callTars(
       ? `${trustedUser}\n\nProduce a single finance_summary read-only card. stats.actions_executed must be 0.`
       : `${trustedUser}\n\nCrew: ${agentType}. stats.actions_executed must always be 0.`;
 
-  const model = agentType === "finance" ? MODELS.finance : MODELS.draft;
+  const model = getDraftModel(agentType === "finance" ? "finance" : "draft");
 
   try {
     const { content, model: usedModel } = await tarsChat(model, draftSystem, draftUser);
-    let parsed = parseAgentRunOutput(extractJson(content || "{}"), agentType);
-    if (!parsed) {
-      const { content: repaired } = await tarsChat(model, repairPrompt, content);
-      parsed = parseAgentRunOutput(extractJson(repaired || "{}"), agentType);
+    let parsed = safeParseTarsOutput(content, agentType);
+    if (!parsed && content) {
+      const { content: repaired } = await tarsChat(model, repairPrompt, content, {
+        maxTokens: 1500,
+      });
+      parsed = safeParseTarsOutput(repaired, agentType);
     }
     if (parsed) {
       parsed.tars_model = usedModel;
@@ -202,7 +219,7 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
       growthInput
     );
     const { fenced, items: processedItems } = fenceExternalContent(items);
-    const playbook = loadPrompt(`prompts/playbooks/${agentType}-playbook.md`);
+    const playbook = PROMPTS.playbooks[agentType];
 
     let output: AgentRunOutput | null = null;
     let usedFallback = false;
@@ -212,9 +229,10 @@ export async function runPipeline(input: RunPipelineInput): Promise<RunPipelineR
     try {
       if (isDemoMode()) {
         // Try live TARS; fallback keeps the demo alive when slow or unreachable
+        const tarsBudgetMs = getTarsRunBudgetMs();
         output = await Promise.race([
           callTars(agentType, founder, fenced, playbook),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 45_000)),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), tarsBudgetMs)),
         ]);
       } else {
         output = await callTars(agentType, founder, fenced, playbook);
