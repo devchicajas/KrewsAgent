@@ -104,13 +104,9 @@ Full walkthrough with 8 screenshots in [README](../README.md#walkthrough): homep
 
 **Demo Video**
 
-Recorded (~60–90s happy path: Try Demo → Ops run → approve card → Growth → Support → Finance → Activity + TARS badge).
+https://www.loom.com/share/18497e22dbf84d328277eed6368fbc87
 
-*(Paste your video URL — YouTube, Loom, Google Drive, etc. — into the Tetrate submission form and below when ready:)*
-
-**Demo Video URL**
-
-*(add link here)*
+Happy path: Try Demo → Ops run → approve card → Growth → Support → Finance → Activity + TARS badge.
 
 ---
 

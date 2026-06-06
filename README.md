@@ -4,7 +4,7 @@
 
 Your AI ops crew — for founders who can't hire help yet, but still can't afford to drop the ball.
 
-> [Live app](https://krews-agent.vercel.app) · [Repo](https://github.com/devchicajas/KrewsAgent) · Built for the [Tetrate AI Buildathon v2.0](https://tetrate.io)
+> [Live app](https://krews-agent.vercel.app) · [Demo video](https://www.loom.com/share/18497e22dbf84d328277eed6368fbc87) · [Repo](https://github.com/devchicajas/KrewsAgent) · Built for the [Tetrate AI Buildathon v2.0](https://tetrate.io)
 
 ## Walkthrough
 
