@@ -90,7 +90,9 @@ https://github.com/devchicajas/KrewsAgent
 
 **Hosted App URL**
 
-*(not deployed — judges can run locally per README)*
+https://krews-agent.vercel.app
+
+**Cold-judge path (no sign-up):** Open URL → **Try the demo** → Dashboard → Run each crew → Activity.
 
 ---
 
@@ -98,13 +100,17 @@ https://github.com/devchicajas/KrewsAgent
 
 **Screenshots**
 
-- Dashboard with approval cards + TARS badge
-- Ops card (Draft / Send buttons)
-- Growth card (Copy text / Open LinkedIn)
+Full walkthrough with 8 screenshots in [README](../README.md#walkthrough): homepage (dark + light), sign up, connect, Ops, Growth, Support, Finance.
 
 **Demo Video**
 
-*(optional — 60s: Try Demo → Run Ops → approve → Growth → Activity audit)*
+Recorded (~60–90s happy path: Try Demo → Ops run → approve card → Growth → Support → Finance → Activity + TARS badge).
+
+*(Paste your video URL — YouTube, Loom, Google Drive, etc. — into the Tetrate submission form and below when ready:)*
+
+**Demo Video URL**
+
+*(add link here)*
 
 ---
 
