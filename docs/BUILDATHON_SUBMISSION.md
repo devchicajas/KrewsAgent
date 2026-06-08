@@ -3,26 +3,6 @@
 
 ---
 
-## Basics
-
-**Title**
-
-KrewsAgent
-
-**One-Liner**
-
-AI ops crews for solo founders — every action waits for your approval before it runs.
-
-**Target User (short — form field)**
-
-Solo pre-seed founders and side-stackers — especially caregivers — who cannot hire ops help yet but still need inbox, support, and growth work done safely.
-
-**Slug**
-
-krewsagent
-
----
-
 ## App Summary
 
 KrewsAgent is an **approval-gated AI operations agent** for solo founders who cannot hire ops help yet.
