@@ -1,6 +1,5 @@
 # KrewsAgent — Tetrate AI Buildathon Submission
 
-Copy each section below into the matching Tetrate form field.
 
 ---
 
