@@ -126,34 +126,3 @@ TARS is the **reasoning layer** only. Gmail draft/send and GitHub issue comments
 
 A friend and I pitched this idea in a competition — eliminated, not chosen. The pitch ended there; I didn't drop the idea. Pre-seed founders juggling home and work can't hire ops yet; most AI acts without permission. I built KrewsAgent myself: same concept, now working.
 
----
-
-## Private Notes — Judges & Admins Only
-
-### Setup Notes
-
-**Quick demo (no OAuth):**
-
-1. `git clone https://github.com/devchicajas/KrewsAgent`
-2. `cp .env.example .env.local` — fill Supabase keys + `AUTH_SECRET`
-3. `npm install && npm run seed && npm run dev`
-4. Open http://localhost:3000 → **TRY THE DEMO** → **RUN CREW**
-
-Supabase SQL: `db/schema.sql` then `db/auth-migrations-combined.sql`
-
-Full OAuth: `docs/INTEGRATIONS_SETUP.md` · `npm run integrations:check`
-
-### Demo Credentials
-
-**Demo mode (recommended):** **TRY THE DEMO** — no login. Fictional founder Jordan, simulated inbox.
-
-**Real account (optional):** Sign up → `/connect` → Gmail + GitHub. Support demo issues: https://github.com/demoprojectz56t-max/concept-to-code-dash/issues
-
-### Internal Notes
-
-- Ops reads inbox + spam; approve → Gmail draft or send (send = double confirm)
-- Support approve → real GitHub comment
-- Growth → shipped input + Open LinkedIn (copy + open feed)
-- Activity page — verify audit hash chain
-- No training on user data
-
