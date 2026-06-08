@@ -122,7 +122,7 @@ TARS is the **reasoning layer** only. Gmail draft/send and GitHub issue comments
 
 ---
 
-## Origin (optional context — not a separate form field)
+## Origin 
 
 A friend and I pitched this idea in a competition — eliminated, not chosen. The pitch ended there; I didn't drop the idea. Pre-seed founders juggling home and work can't hire ops yet; most AI acts without permission. I built KrewsAgent myself: same concept, now working.
 
@@ -157,6 +157,3 @@ Full OAuth: `docs/INTEGRATIONS_SETUP.md` · `npm run integrations:check`
 - Activity page — verify audit hash chain
 - No training on user data
 
-**Private Repository URL**
-
-*(leave blank — repo is public)*
