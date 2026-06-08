@@ -40,7 +40,7 @@ Built solo for **Tetrate AI Buildathon v2.0**. Tagline: *Work done. Control kept
 
 ## AI Feature Summary
 
-KrewsAgent is **not a chat wrapper**. AI powers a structured **agent loop**: read workspace → classify → draft actions → queue for human approval → execute tools only after approval.
+KrewsAgent is **not a chat wrapper**. AI powers a structured **agent loop**: read workspace → (optional) classify → TARS draft → queue for human approval → execute tools only after approval.
 
 | Crew | AI does | User experience |
 |------|---------|-----------------|
@@ -49,7 +49,7 @@ KrewsAgent is **not a chat wrapper**. AI powers a structured **agent loop**: rea
 | **Growth** | Turns “what I shipped this week” into a LinkedIn post + cold outreach sequence. | Copy/paste yourself — no bot posting (LinkedIn ToS). |
 | **Finance** | Summarizes MRR, runway, and burn from founder context. | Read-only health snapshot — no actions to approve. |
 
-**Shared pipeline (7 stages):** context → untrusted-input fencing → TARS classification → TARS drafting (crew playbook) → allowlist + risk validation → pending approval queue → audit log.
+**Shared pipeline (7 stages):** context → untrusted-input fencing → optional TARS classify (skipped in default demo) → TARS draft (crew playbook) → JSON repair if needed → allowlist + risk validation → pending approval queue → audit log.
 
 **Safety AI behaviors:** External email/issue text is fenced as untrusted data (prompt-injection patterns neutralized). Security advisories pair with optional cautious reply drafts for unverified senders. High-risk actions require explicit acknowledgment; email Send requires double confirmation.
 
@@ -61,13 +61,27 @@ Every live crew run routes inference through **Tetrate TARS** (Agent Router Serv
 
 - **Client:** OpenAI-compatible API at `https://api.router.tetrate.ai/v1` (`lib/tarsClient.ts`)
 - **Config:** `TARS_API_KEY` + `TARS_BASE_URL` — no vendor SDK lock-in
-- **Drafting:** `claude-sonnet-4-6` — turns fenced Gmail/GitHub workspace + crew playbook into structured JSON `approval_cards`
-- **Classification:** `claude-haiku-4-5` — triage labels (URGENT / REPLY_NEEDED / FYI / NOISE)
-- **Fallbacks:** `gpt-4o`, `gemini-2.5-flash` if the primary model fails or times out
-- **Resilience:** Demo mode tries live TARS first (~45–55s budget on Vercel); if unreachable, cached fallback still flows through the **same approval gate** so the demo never dead-ends
-- **Transparency:** Dashboard shows `>>> ROUTED VIA TARS → [model] <<<` after each successful run
 
-TARS is the **reasoning layer** between real workspace data and grounded proposals. Tool execution (Gmail draft/send, GitHub comment) happens **after** approval — not inside the model call.
+**Models routed via TARS:**
+
+- **Draft (Ops / Growth / Support):** `claude-haiku-4-5` on Vercel (serverless time limits); `claude-sonnet-4-6` when running locally
+- **Finance summary:** `gpt-4o-mini`
+- **Optional classify (Ops / Support only, when `DEMO_MODE=false`):** `claude-haiku-4-5` for URGENT / REPLY_NEEDED / FYI / NOISE — **skipped** in the default demo path (what most judges use) for speed
+- **Fallback if primary fails:** `gpt-4o-mini` on Vercel; `gpt-4o` and `gemini-2.5-flash` locally
+
+**Per run:**
+
+1. Fence Gmail/GitHub text (or growth input) as untrusted workspace data
+2. Optionally call TARS classify (non-demo Ops/Support only)
+3. Call TARS with crew playbook → structured JSON `approval_cards`
+4. JSON repair pass if the response does not parse
+5. Server allowlist + risk floors → insert **pending** approvals (zero side effects)
+
+**Resilience:** Default demo mode races live TARS against a **~55s** wall-clock budget on Vercel (**28s** per-request timeout). If TARS is slow or unreachable, cached fallback proposals still flow through the **same approval gate** — the demo does not dead-end.
+
+**Transparency:** Dashboard shows `>>> ROUTED VIA TARS → [model] <<<` (production runs typically show `claude-haiku-4-5-…`).
+
+TARS is the **reasoning layer** only. Gmail draft/send and GitHub issue comments execute in `approvalGuard.ts` **after** human approve — not inside the model call.
 
 ---
 
@@ -108,7 +122,8 @@ TARS is the **reasoning layer** between real workspace data and grounded proposa
 
 - LinkedIn/outreach: copy/paste only — no auto-post (platform ToS + bot risk)
 - Gmail Send: requires second click to confirm
-- Classification skipped in demo mode for speed (drafting still uses TARS)
+- Vercel uses Haiku (not Sonnet) for drafting so runs finish within serverless limits
+- Classification skipped in default demo mode for speed; when enabled, classify result is not yet wired into draft (future hardening)
 - Finance reads seeded `founder_context` — no Stripe live feed yet (MVP2)
 - Google OAuth in Testing mode limits Gmail connect to registered test users until app verification
 
